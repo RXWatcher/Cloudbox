@@ -1,0 +1,172 @@
+##########################################################################
+# Title:         Cloudbox: Traefik | Default Variables                      #
+# Author(s):     desimaniac                                              #
+# URL:           https://github.com/cloudbox/cloudbox                    #
+# --                                                                     #
+#         Part of the Cloudbox project: https://cloudbox.works           #
+##########################################################################
+#                   GNU General Public License v3.0                      #
+##########################################################################
+---
+################################
+# Name
+################################
+
+traefik_name: traefik
+
+################################
+# Subdomain
+################################
+
+traefik_subdomain: "{{ traefik_name }}"
+
+subdomain: "{{ traefik_subdomain }}"
+
+################################
+# Folders
+################################
+
+traefik_folder: "{{ traefik_name }}"
+
+traefik_folders:
+  - "{{ server_appdata_path }}/{{ traefik_folder }}"
+
+folders: "{{ traefik_folders }}"
+
+################################
+# Files
+################################
+
+traefik_config_path: "{{ server_appdata_path }}/{{ traefik_folder }}/traefik.yml"
+
+################################
+# Docker Container
+################################
+
+traefik_docker_name: "{{ traefik_name }}"
+
+docker_name: "{{ traefik_docker_name }}"
+
+################################
+# Docker Image
+################################
+
+traefik_docker_image: "traefik:latest"
+
+docker_image: "{{ traefik_docker_image }}"
+
+traefik_docker_pull: yes
+
+docker_pull: "{{ traefik_docker_pull }}"
+
+################################
+# Docker Ports
+################################
+
+traefik_main_ports:
+  - "80:80/tcp"
+  - "443:443/tcp"
+
+traefik_docker_ports: "{{ (traefik_main_ports) }}"
+
+docker_ports: "{{ traefik_docker_ports }}"
+
+################################
+# Docker Envs
+################################
+
+traefik_docker_envs_standard:
+  CLOUDFLARE_EMAIL: "{{ cloudflare.email }}"
+  CLOUDFLARE_API_KEY: "{{ cloudflare.api }}"
+
+traefik_docker_envs: "{{ (traefik_docker_envs_standard) }}"
+
+docker_envs: "{{ traefik_docker_envs }}"
+
+################################
+# Docker Volumes
+################################
+
+traefik_docker_volumes:
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  - "{{ server_appdata_path }}/{{ traefik_folder }}:/etc/traefik"
+
+docker_volumes: "{{ traefik_docker_volumes }}"
+
+################################
+# Docker Devices
+################################
+
+traefik_docker_devices: []
+
+docker_devices: "{{ traefik_docker_devices }}"
+
+################################
+# Docker Hosts
+################################
+
+traefik_docker_hosts: {}
+
+docker_hosts: "{{ traefik_docker_hosts }}"
+
+################################
+# Docker Labels
+################################
+
+traefik_docker_labels:
+  # Traefik dashboard
+  - traefik.http.routers.traefik.service: "api@internal"
+  - traefik.http.routers.traefik.middlewares: "authtraefik"
+  - traefik.http.middlewares.authtraefik.basicauth.usersfile: "/etc/traefik/.htpasswd"
+  # Redirect http to https
+  - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"
+  - traefik.http.routers.redirs.rule: "hostregexp(`{host:.+}`)"
+  - traefik.http.routers.redirs.entrypoints: "web"
+  - traefik.http.routers.redirs.middlewares: "redirect-to-https"
+
+docker_labels: "{{ docker_labels_common | combine(traefik_docker_labels) }}"
+
+################################
+# Docker Networks
+################################
+
+traefik_docker_network_alias: "{{ traefik_name }}"
+
+docker_network_alias: "{{ traefik_docker_network_alias }}"
+
+traefik_docker_networks: []
+
+docker_networks: "{{ (docker_networks_common) if not (traefik_docker_networks and traefik_docker_networks | length > 0) else (traefik_docker_networks) }}"
+
+################################
+# Docker Capabilities
+################################
+
+traefik_docker_capabilities: []
+
+docker_capabilities: "{{ traefik_docker_capabilities }}"
+
+################################
+# Docker Security
+################################
+
+traefik_docker_security_opts: []
+
+docker_security_opts: "{{ traefik_docker_security_opts }}"
+
+################################
+# Docker Restart Policy
+################################
+
+traefik_docker_restart_policy: "unless-stopped"
+
+docker_restart_policy: "{{ traefik_docker_restart_policy }}"
+
+################################
+# Docker State
+################################
+
+traefik_docker_state: started
+
+docker_state: "{{ traefik_docker_state }}"

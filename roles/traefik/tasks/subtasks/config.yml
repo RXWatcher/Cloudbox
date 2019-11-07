@@ -1,0 +1,33 @@
+#########################################################################
+# Title:         Cloudbox: Plex | Preferences Task                      #
+# Author(s):     desimaniac                                             #
+# URL:           https://github.com/Cloudbox/Community                  #
+# --                                                                    #
+#         Part of the Cloudbox project: https://cloudbox.works          #
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Config | Check if '{{ traefik_config_path | basename }}' exists"
+  stat:
+    path: "{{ traefik_config_path }}"
+  register: traefik_file
+
+- name: "Import '{{ traefik_config_path | basename }}' file if it doesnt exist"
+  template:
+    src: traefik.yml.j2
+    dest: "{{ traefik_config_path }}"
+    force: yes
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0775
+  when: not traefik_file.stat.exists
+
+- name: Settings | Static | Create '.htpasswd'
+  htpasswd:
+    path: "{{ server_appdata_path }}/{{ traefik_folder }}/.htpasswd"
+    name: "{{ user.name }}"
+    password: "{{ user.pass }}"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0775

@@ -167,7 +167,10 @@ docker_devices_dev_dri:
 ################################
 
 docker_labels_common:
-  "com.github.cloudbox.cloudbox_managed": "true"
+  - "com.github.cloudbox.cloudbox_managed": "true"
+  - '{ "traefik.http.routers.{{ subdomain }}.tls.certresolver": "leresolver" }'
+  - '{ "traefik.http.routers.{{ subdomain }}.entrypoints": "websecure" }'
+  - '{ "traefik.http.routers.{{ subdomain }}.rule": "Host(`{{ subdomain }}.{{ user.domain }}`)" }'
 
 ################################
 # Docker Network
