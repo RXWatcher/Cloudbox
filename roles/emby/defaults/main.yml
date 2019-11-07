@@ -147,6 +147,7 @@ docker_hosts: "{{ emby_docker_hosts }}"
 
 emby_docker_labels:
     - '{ "traefik.http.services.{{ subdomain }}.loadbalancer.server.port": "{{ web_port }}" }'
+    - traefik.enable: true
 
 docker_labels: "{{ docker_labels_common | combine(emby_docker_labels) }}"
 

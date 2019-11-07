@@ -132,6 +132,7 @@ docker_hosts: "{{ jackett_docker_hosts }}"
 
 jackett_docker_labels:
     - '{ "traefik.http.services.{{ subdomain }}.loadbalancer.server.port": "{{ web_port }}" }'
+    - traefik.enable: true
 
 docker_labels: "{{ docker_labels_common | combine(jackett_docker_labels) }}"
 
