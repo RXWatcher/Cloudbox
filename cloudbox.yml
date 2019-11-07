@@ -60,3 +60,4 @@
     - { role: nginx, tags: ['nginx'] }
     - { role: nzbthrottle, tags: ['nzbthrottle'] }
     - { role: ddclient, tags: ['ddclient'] }
+    - { role: traefik, tags: ['traefik'] }

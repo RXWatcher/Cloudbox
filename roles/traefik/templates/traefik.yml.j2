@@ -1,0 +1,26 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+entryPoints:
+  web:
+    address: :80
+  websecure:
+    address: :443
+providers:
+  docker:
+    watch: true
+    exposedByDefault: true
+api:
+  dashboard: true
+log:
+  level: debug
+  filePath: /etc/traefik/traefik.log
+accessLog:
+  filePath: /etc/traefik/traefik_access.log
+certificatesResolvers:
+  leresolver:
+    acme:
+      caserver: https://acme-staging-v02.api.letsencrypt.org/directory
+      email: {{ user.email }}
+      storage: /etc/traefik/acme.json
+      tlschallenge: true
