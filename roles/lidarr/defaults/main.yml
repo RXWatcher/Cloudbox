@@ -133,7 +133,8 @@ docker_hosts: "{{ lidarr_docker_hosts }}"
 # Docker Labels
 ################################
 
-lidarr_docker_labels: {}
+lidarr_docker_labels:
+    - '{ "traefik.http.services.{{ subdomain }}.loadbalancer.server.port": "{{ web_port }}" }'
 
 docker_labels: "{{ docker_labels_common | combine(lidarr_docker_labels) }}"
 

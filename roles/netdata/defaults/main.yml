@@ -132,7 +132,8 @@ docker_hosts: "{{ netdata_docker_hosts }}"
 # Docker Labels
 ################################
 
-netdata_docker_labels: {}
+netdata_docker_labels:
+    - '{ "traefik.http.services.{{ subdomain }}.loadbalancer.server.port": "{{ web_port }}" }'
 
 docker_labels: "{{ docker_labels_common | combine(netdata_docker_labels) }}"
 
