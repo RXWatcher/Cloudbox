@@ -171,6 +171,8 @@ docker_labels_common:
   - '{ "traefik.http.routers.{{ subdomain }}.tls.certresolver": "leresolver" }'
   - '{ "traefik.http.routers.{{ subdomain }}.entrypoints": "websecure" }'
   - '{ "traefik.http.routers.{{ subdomain }}.rule": "Host(`{{ subdomain }}.{{ user.domain }}`)" }'
+  - '{ "traefik.http.routers.{{ subdomain }}.tls.options": "securetls@file" }'
+  - '{ "traefik.http.routers.{{ subdomain }}.middlewares": "secureHeaders@file" }'
 
 ################################
 # Docker Network
