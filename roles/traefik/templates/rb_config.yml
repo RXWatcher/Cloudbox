@@ -1,0 +1,42 @@
+traefik:
+    image: "traefik:v2.0"
+    container_name: traefik
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${APPDATA_ROOT}/traefik:/etc/traefik"
+    ports:
+      - "443:443"
+    environment:
+      CLOUDFLARE_EMAIL: "${CLOUDFLARE_EMAIL}"
+      CLOUDFLARE_API_KEY: "${CLOUDFLARE_API_KEY}"
+    command:
+      - "--global.sendanonymoususage=false"
+      - "--providers.file.directory=/etc/traefik"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.cfdns.acme.dnschallenge=true"
+      - "--certificatesresolvers.cfdns.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.cfdns.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.cfdns.acme.storage=/etc/traefik/acme.json"
+  forwardauth:
+    image: "thomseddon/traefik-forward-auth"
+    container_name: forwardauth
+    environment: 
+      CLIENT_ID: "${OAUTH_CLIENT_ID}"
+      CLIENT_SECRET: "${OAUTH_CLIENT_SECRET}"
+      SECRET: "${OAUTH_SECRET}"
+      COOKIE_DOMAIN: "${TLD}"
+      LIFETIME: "2592000"
+      AUTH_HOST: "forwardauth.${TLD}"
+      WHITELIST: "${WHITELIST}"
+      PUID: "${UID}"
+      PGID: "${UID}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.oauth.rule=Host(`forwardauth.${TLD}`)"
+      - "traefik.http.routers.oauth.entrypoints=websecure"
+      - "traefik.http.routers.oauth.tls.options=securetls@file"
+      - "traefik.http.routers.oauth.tls.certresolver=cfdns"
+      - "traefik.http.routers.oauth.middlewares=secureHeaders@file,googleAuth@file"
+      - "traefik.http.services.oauth.loadbalancer.server.port=4181"  #used to be traefik.port

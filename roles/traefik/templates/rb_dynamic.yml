@@ -1,0 +1,47 @@
+tls:
+  options:
+    securetls:
+      sniStrict: true
+      minVersion: VersionTLS12
+      cipherSuites:
+        - TLS_CHACHA20_POLY1305_SHA256
+        - TLS_AES_256_GCM_SHA384 
+        - TLS_AES_128_GCM_SHA256
+        -  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_RSA_WITH_AES_256_GCM_SHA384
+http:
+  middlewares:
+    googleAuth:
+      forwardAuth:
+        address: "http://oauth:4181"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-Forwarded-User"
+    secureHeaders:
+      headers:
+        FrameDeny: true
+        SSLRedirect: true
+        stsSeconds: 315360000
+        stsPreload: true
+        stsIncludeSubdomains: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        X-Custom-Request-Header: "X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+
+  portainer:
+    image: "portainer/portainer"
+    container_name: portainer
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${TLD}`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls.options=securetls@file"
+      - "traefik.http.routers.portainer.tls.certresolver=cfdns"
+      - "traefik.http.routers.portainer.middlewares=secureHeaders@file,googleAuth@file"
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "${APPDATA_ROOT}/portainer:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      PUID: "${UID}"
+      PGID: "${UID}"

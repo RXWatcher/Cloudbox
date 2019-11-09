@@ -1,0 +1,12 @@
+http:
+  middlewares:
+    secureHeaders:
+      headers:
+        FrameDeny: true
+        SSLRedirect: true
+        stsSeconds: 315360000
+        stsPreload: true
+        stsIncludeSubdomains: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        X-Custom-Request-Header: "X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
