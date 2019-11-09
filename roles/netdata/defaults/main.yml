@@ -136,7 +136,8 @@ netdata_docker_labels:
     - '{ "traefik.http.services.{{ subdomain }}.loadbalancer.server.port": "{{ web_port }}" }'
     - '{ "traefik.http.routers.{{ subdomain }}.middlewares": "authtraefik" }'
     - traefik.http.middlewares.authtraefik.basicauth.usersfile: "/etc/traefik/.htpasswd"
-    - traefik.enable: true
+    - "traefik.enable": "true"
+
 
 docker_labels: "{{ docker_labels_common | combine(netdata_docker_labels) }}"
 

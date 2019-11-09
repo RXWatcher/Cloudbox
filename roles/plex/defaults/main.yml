@@ -189,7 +189,7 @@ docker_hosts: "{{ plex_docker_hosts }}"
 
 plex_docker_labels:
     - '{ "traefik.http.services.{{ subdomain }}.loadbalancer.server.port": "{{ web_port }}" }'
-    - traefik.enable: true
+    - "traefik.enable": "true"
     
 docker_labels: "{{ docker_labels_common | combine(plex_docker_labels) }}"
 

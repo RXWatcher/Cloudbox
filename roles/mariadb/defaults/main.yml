@@ -124,7 +124,7 @@ docker_hosts: "{{ mariadb_docker_hosts }}"
 
 mariadb_docker_labels:
     - '{ "traefik.http.services.{{ subdomain }}.loadbalancer.server.port": "{{ web_port }}" }'
-    - traefik.enable: false
+    - "traefik.enable": "false"
 
 docker_labels: "{{ docker_labels_common | combine(mariadb_docker_labels) }}"
 
