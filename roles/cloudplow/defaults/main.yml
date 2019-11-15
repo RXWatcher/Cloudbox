@@ -28,8 +28,6 @@ cloudplow_requirements_path: "{{ cloudplow_path }}/requirements.txt"
 
 cloudplow_pip_excutable: "pip3"
 
-pip_executable: "{{ cloudplow_pip_excutable }}"
-
 cloudplow_config_path: "{{ cloudplow_path }}/config.json"
 
 cloudplow_alias_path: "/usr/local/bin/{{ cloudplow_name }}"

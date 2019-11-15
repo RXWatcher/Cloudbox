@@ -35,7 +35,7 @@
 - name: Install pip requirements
   pip:
     requirements: "{{ cloudplow_requirements_path }}"
-    executable: "{{ pip_executable }}"
+    executable: "{{ cloudplow_pip_excutable }}"
 
 - name: Set script as executable
   file:
