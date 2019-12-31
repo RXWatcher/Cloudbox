@@ -14,6 +14,7 @@
   - name: Gather list of installed Docker containers
     shell: "docker ps -a --format '{{ '{{' }} .Names{{ '}}' }}' | sort | xargs echo -n"
     register: docker_installed_containers_list
+    changed_when: no
 
   - name: Set 'docker_installed_containers_list' variable
     set_fact:
@@ -25,4 +26,4 @@
 
 - name: "Continue when Plex Docker container exists"
   import_tasks: "main2.yml"
-  when: ('plex' in docker_installed_containers_list)
+  when: (plex_docker_container in docker_installed_containers_list)

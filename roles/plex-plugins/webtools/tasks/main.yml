@@ -1,0 +1,15 @@
+#########################################################################
+# Title:         Cloudbox: Plex Plugins / WebTools                      #
+# Author(s):     desimaniac                                             #
+# URL:           https://github.com/cloudbox/cloudbox                   #
+# --                                                                    #
+#         Part of the Cloudbox project: https://cloudbox.works          #
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: Install Tasks
+  include_tasks: subtasks/install.yml
+
+- name: Post-Install Tasks
+  include_tasks: subtasks/post-install.yml

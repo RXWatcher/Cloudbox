@@ -28,7 +28,7 @@
     - "{{ downloads.nzbs }}/sabnzbd"
     - "{{ downloads.nzbs }}/sabnzbd/complete"
     - "{{ downloads.nzbs }}/sabnzbd/incomplete"
-    - "{{ downloads.nzbs }}/sabnzbd/watched"
+    - "{{ downloads.nzbs }}/sabnzbd/watch"
     - "{{ downloads.nzbs }}/sabnzbd/logs"
 
 - name: Check sabnzbd.ini exists
@@ -53,9 +53,9 @@
     env:
       PUID: "{{ uid }}"
       PGID: "{{ gid }}"
-      UMASK: 002
+      UMASK: "002"
       VIRTUAL_HOST: "sabnzbd.{{ user.domain }}"
-      VIRTUAL_PORT: 8080
+      VIRTUAL_PORT: "8080"
       LETSENCRYPT_HOST: "sabnzbd.{{ user.domain }}"
       LETSENCRYPT_EMAIL: "{{ user.email }}"
       TZ: "{{ tz }}"
@@ -71,7 +71,7 @@
     state: started
 
 - name: Settings Tweaks
-  include_tasks: "subtasks/sabnzbd_settings.yml"
+  include_tasks: "subtasks/settings.yml"
   when: not (
         (sabnzbd_ini.stat.exists)
         or

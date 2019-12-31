@@ -8,31 +8,29 @@
 #                   GNU General Public License v3.0                     #
 #########################################################################
 ---
-- name: Variables Task
-  import_tasks: "subtasks/variables.yml"
-
 - name: Create DNS Record
   include_role:
     name: dns
   vars:
-    record: "{{ subdomain }}"
-  when: reverse_proxy_is_enabled
+    record: "{{ item }}"
+  loop:
+    - "{{ lookup('vars', role_name + '_subdomain') }}"
 
 - name: Remove existing Docker container
   docker_container:
-    name: "{{ docker_name }}"
+    name: "{{ lookup('vars', role_name + '_docker_container') }}"
     state: absent
 
 - name: Create directories
   file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
-  with_items: "{{ folders }}"
+  with_items: "{{ lookup('vars', role_name + '_folders') }}"
+
+- name: Docker Devices Task
+  include_tasks: "{{ resources_tasks_path }}/docker/set_docker_devices_variable.yml"
+  when: (gpu.intel or gpu.nvidia.enabled)
 
 - name: Create Docker container
-  include_tasks: "{{ playbook_dir }}/resources/tasks/docker/create_docker_container.yml"
+  include_tasks: "{{ resources_tasks_path }}/docker/create_docker_container.yml"
 
 - name: Post-Install Tasks
   import_tasks: "subtasks/post-install.yml"
-
-- name: Settings Tasks
-  include_tasks: "subtasks/settings.yml"
-  when: reverse_proxy_is_enabled
