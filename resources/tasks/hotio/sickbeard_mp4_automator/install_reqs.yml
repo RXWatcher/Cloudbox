@@ -10,10 +10,10 @@
 ---
 - name: Set 'script_d_path' variable
   set_fact:
-    script_d_path: "{{ lookup('vars', role_name + '_path') }}/script.d/"
+    script_d_path: "{{ lookup('vars', role_name + '_paths_location') }}/script.d"
 
 - name: Create directories
-  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  file: "path={{ item }} state=directory owner={{ user.name }} group={{ user.name }} mode=0775"
   with_items:
     - "{{ script_d_path }}"
 

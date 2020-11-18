@@ -12,9 +12,10 @@
   docker_container:
     name: nginx-proxy
     state: absent
+    container_default_behavior: compatibility
 
 - name: Nginx-Proxy | Create nginx-proxy directories
-  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }} recurse=yes"
+  file: "path={{ item }} state=directory owner={{ user.name }} group={{ user.name }} mode=0775 recurse=yes"
   with_items:
     - /opt/nginx-proxy
     - /opt/nginx-proxy/certs
@@ -23,7 +24,7 @@
     - /opt/nginx-proxy/vhost.d
 
 - name: Nginx-Proxy | Create nginx-proxy directories
-  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }} recurse=yes"
+  file: "path={{ item }} state=directory owner={{ user.name }} group={{ user.name }} mode=0775 recurse=yes"
   with_items:
     - /opt/nginx-proxy/tmpl
     - /opt/nginx-proxy/certs/letsencrypt
@@ -38,7 +39,17 @@
     mode: 0775
     force: yes
 
-# Letsencrypt DNS Validation Only
+- name: Nginx-Proxy | Remove previous 'default.conf' path
+  file:
+    path: /opt/nginx-proxy/conf.d/default.conf
+    state: absent
+
+# Fixes random issue of folder being created in its place
+- name: Nginx-Proxy | Remove previous 'nginx.tmpl' path
+  file:
+    path: "/opt/nginx-proxy/tmpl/nginx.tmpl"
+    state: absent
+
 - name: Nginx-Proxy | Import 'nginx.tmpl' file
   copy:
     src: "dns_validation/nginx.tmpl"
@@ -67,7 +78,7 @@
 - name: Nginx-Proxy | Build 'docker_volumes' list variable
   set_fact:
     nginx_proxy_docker_volumes: "{{ nginx_proxy_docker_volumes  + letsencrypt_dns_validation_docker_volumes }}"
-  when: cloudflare_is_enabled
+  when: cloudflare_is_enabled and reverse_proxy.wildcard_certs
 
 - name: Nginx-Proxy | Create and start container
   docker_container:
@@ -84,11 +95,13 @@
     labels:
       "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy": "true"
       "com.github.cloudbox.cloudbox_managed": "true"
-    networks_cli_compatible: yes
     networks:
       - name: cloudbox
         aliases:
           - nginx-proxy
+    networks_cli_compatible: yes
+    network_mode: "{{ docker_networks_name_common }}"
     purge_networks: yes
+    container_default_behavior: compatibility
     restart_policy: unless-stopped
     state: started

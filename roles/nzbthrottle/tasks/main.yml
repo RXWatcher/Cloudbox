@@ -13,9 +13,10 @@
   docker_container:
     name: nzbthrottle
     state: absent
+    container_default_behavior: compatibility
 
 - name: Create nzbthrottle directories
-  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }} recurse=yes"
+  file: "path={{ item }} state=directory owner={{ user.name }} group={{ user.name }} mode=0775 recurse=yes"
   with_items:
     - /opt/nzbthrottle
 
@@ -54,6 +55,8 @@
       - name: cloudbox
         aliases:
           - nzbthrottle
+    networks_cli_compatible: yes
+    network_mode: "{{ docker_networks_name_common }}"
     purge_networks: yes
     restart_policy: unless-stopped
     state: started

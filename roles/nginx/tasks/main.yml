@@ -13,21 +13,21 @@
   include_role:
     name: dns
   vars:
-    record: "{{ nginx.subdomain|default('web',true) }}"
+    dns_record: "{{ nginx.subdomain|default('web',true) }}"
   when: not (nginx.direct_domain|default(false,true))
 
 - name: Create DNS Record
   include_role:
     name: dns
   vars:
-    record: "{{ item }}"
+    dns_record: "{{ item }}"
   with_items:
     - "{{ user.domain }}"
     - "www"
   when: (nginx.direct_domain|default(false,true))
 
 - name: Create nginx directories
-  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  file: "path={{ item }} state=directory owner={{ user.name }} group={{ user.name }} mode=0775"
   with_items:
     - /opt/nginx
 
@@ -35,6 +35,7 @@
   docker_container:
     name: nginx
     state: absent
+    container_default_behavior: compatibility
 
 - name: Create and start container
   docker_container:
@@ -57,6 +58,8 @@
       - name: cloudbox
         aliases:
           - nginx
+    networks_cli_compatible: yes
+    network_mode: "{{ docker_networks_name_common }}"
     purge_networks: yes
     restart_policy: unless-stopped
     state: started

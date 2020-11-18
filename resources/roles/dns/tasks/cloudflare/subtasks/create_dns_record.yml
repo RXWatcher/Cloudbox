@@ -8,39 +8,32 @@
 #                   GNU General Public License v3.0                     #
 #########################################################################
 ---
-- name: Cloudflare | Install 'dnsutils'
-  apt: "name=dnsutils state=present"
-
-- name: Cloudflare | Get Public IP Address
-  shell: "{{ ip_address_lookup_command }}"
-  register: public_ip_lookup
-
-- name: Cloudflare | Set 'public_ip' variable
+- name: Cloudflare | Create DNS Record | Set 'dns_zone' variable
   set_fact:
-    public_ip: "{{ public_ip_lookup.stdout }}"
+    dns_zone: "{{ dns_zone | default(user.domain) }}"
 
-- name: Cloudflare | Set DNS Record
+- name: Cloudflare | Create DNS Record | Set DNS Record
   cloudflare_dns:
     account_api_token: "{{ cloudflare.api }}"
     account_email: "{{ cloudflare.email }}"
-    zone: "{{ user.domain }}"
+    zone: "{{ dns_zone }}"
     state: present
     solo: true
-    proxied: no
+    proxied: "{{ dns.proxied }}"
     type: A
-    value: "{{ public_ip }}"
-    record: "{{ record }}"
+    value: "{{ ip_address_public }}"
+    record: "{{ dns_record }}"
   register: cloudflare_dns_record_creation_status
 
-- name: Cloudflare | Tasks on success
+- name: Cloudflare | Create DNS Record | Tasks on success
   block:
 
-  - name: Cloudflare | Set 'record_temp' variable
+  - name: Cloudflare | Create DNS Record | Set 'dns_record_print' variable
     set_fact:
-      record_temp: "{{ (record == user.domain) | ternary(user.domain,record + '.' + user.domain) }}"
+      dns_record_print: "{{ (dns_record == dns_zone) | ternary(dns_zone,dns_record + '.' + dns_zone) }}"
 
-  - name: Cloudflare | Display DNS record creation status
+  - name: Cloudflare | Create DNS Record | Display DNS Record creation status
     debug:
-      msg: "DNS Record for '{{ record_temp }}' set to '{{ public_ip }}'."
+      msg: "DNS Record for '{{ dns_record_print }}' set to '{{ ip_address_public }}'."
 
   when: cloudflare_dns_record_creation_status is succeeded

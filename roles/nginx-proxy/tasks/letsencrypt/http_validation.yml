@@ -1,6 +1,6 @@
 #########################################################################
 # Title:         Cloudbox: Nginx-Proxy | Letsencrypt | HTTP Validation  #
-# Author(s):     desimaniac                                             #
+# Author(s):     desimaniac, l3uddz                                     #
 # URL:           https://github.com/cloudbox/cloudbox                   #
 # --                                                                    #
 #         Part of the Cloudbox project: https://cloudbox.works          #
@@ -25,11 +25,13 @@
       TZ: "{{ tz }}"
     labels:
       "com.github.cloudbox.cloudbox_managed": "true"
-    networks_cli_compatible: yes
     networks:
       - name: cloudbox
         aliases:
           - letsencrypt
+    networks_cli_compatible: yes
+    network_mode: "{{ docker_networks_name_common }}"
     purge_networks: yes
+    container_default_behavior: compatibility
     restart_policy: unless-stopped
     state: started

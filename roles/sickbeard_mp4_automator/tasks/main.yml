@@ -9,7 +9,7 @@
 #########################################################################
 ---
 - name: "Create 'sickbeard_mp4_automator' directory"
-  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }} recurse=yes"
+  file: "path={{ item }} state=directory owner={{ user.name }} group={{ user.name }} mode=0775 recurse=yes"
   with_items:
     - "/opt/scripts/sickbeard_mp4_automator"
 
@@ -25,7 +25,7 @@
 
 - name: "Wait for 'autoProcess.ini.sample' file"
   wait_for:
-    path: "/opt/scripts/sickbeard_mp4_automator/autoProcess.ini.sample"
+    path: "/opt/scripts/sickbeard_mp4_automator/setup/autoProcess.ini.sample"
     state: present
 
 - name: "Check if 'autoProcess.ini' file exists"
@@ -46,6 +46,11 @@
   import_tasks: "plex_autoscan_py.yml"
   when: not plex_autoscan_py.stat.exists
 
+- name: Create 'sma_update_container' variable
+  set_fact:
+    sma_update_container: "{{ ('sma' in ansible_run_tags
+                                  or 'sickbeard_mp4_automator' in ansible_run_tags) }}"
+
 - name: "Update Docker Containers Task"
   include_tasks: "update_docker_containers.yml"
   loop:
@@ -54,3 +59,4 @@
     - "nzbget"
   loop_control:
     loop_var: app
+  when: sma_update_container

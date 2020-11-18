@@ -1,45 +1,40 @@
 ---
 version: 1.0.0-{build}
 
-branches:
-  except:
-    - master
-
 skip_tags: true
 
 skip_commits:
   files:
-    # git
+
+    # Git
     - '.gitignore'
     - '.gitmodules'
     - '.github/**/*'
 
-    # docs
+    # Docs
     - '*.md'
 
-    # vagrant
+    # Vagrant
     - 'Vagrantfile'
 
-    # ansible config
+    # Ansible Misc
     - 'defaults/**/*'
+    - 'roles/*/files/**/*'
     - 'filter_plugins/**/*'
     - 'inventories/**/*'
     - 'library/**/*'
 
-    # ansible roles
-    - 'roles/*/files/**/*'
+    # Ansible Roles - Core
     - 'roles/settings/**/*'
     - 'roles/backup/**/*'
     - 'roles/restore/**/*'
 
-    # ansible roles extras
+    # Ansible Roles - Extras
     - 'roles/cloudflare/**/*'
     - 'roles/ddclient/**/*'
-    - 'roles/emby/**/*'
     - 'roles/feeder/**/*'
     - 'roles/mariadb/**/*'
     - 'roles/nginx/**/*'
-    - 'roles/netdata/**/*'
     - 'roles/notify/**/*'
     - 'roles/nvidia/**/*'
     - 'roles/nzbthrottle/**/*'
@@ -47,15 +42,15 @@ skip_commits:
     - 'roles/plex_dupefinder/**/*'
     - 'roles/plex_patrol/**/*'
     - 'roles/python-plexlibrary/**/*'
-    - 'roles/resilio-sync/**/*'
-    - 'roles/sabnzbd/**/*'
     - 'roles/sickbeard_mp4_automator/**/*'
+    - 'roles/sstvirl/**/*'
     - 'roles/subliminal/**/*'
+    - 'roles/trackarr/**/*'
     - 'roles/traktarr/**/*'
 
   message: /\[minor\]/
 
-image: Ubuntu1604
+image: Ubuntu1804-minimal
 
 matrix:
   fast_finish: true
@@ -64,15 +59,15 @@ matrix:
 build: off
 
 init:
-  - sh: curl -s https://cloudbox.works/scripts/dep.sh | sudo -H sh
+  - sh: curl -s https://cloudbox.works/scripts/dep.sh | sudo -H sh &> /dev/null
 
 install:
-  - sh: sudo pip install 'ansible>=2.8,<2.9'
+  - sh: sudo -H pip install 'ansible>=2.9,<2.10'
   - sh: git submodule update --init --recursive
   - sh: for i in defaults/*; do cp -n $i "$(basename "${i%.*}")"; done
   - sh: sudo ansible-playbook cloudbox.yml --syntax-check
   - sh: |
-      sudo ansible-playbook cloudbox.yml --tags "cloudbox" \
+      sudo ansible-playbook cloudbox.yml --tags "cloudbox,emby,netdata,sabnzbd" \
           --skip-tags "settings" \
           --extra-vars '{"continuous_integration":true}'
 

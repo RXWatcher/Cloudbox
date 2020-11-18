@@ -17,7 +17,7 @@
     loop_var: outer_item
 
 - name: Create common directories
-  file: "path={{ item }} state=directory mode=0775 owner={{ user.name }} group={{ user.name }}"
+  file: "path={{ item }} state=directory owner={{ user.name }} group={{ user.name }} mode=0775"
   with_items:
     - /home/{{ user.name }}
     - /home/{{ user.name }}/logs
@@ -116,7 +116,10 @@
     - (gpu.intel)
 
 - name: Install 'intel-gpu-tools'
-  apt: "name=intel-gpu-tools state=present"
+  apt:
+    state: present
+    name:
+      - "intel-gpu-tools"
   when:
     - (gpu.intel)
     - ('i915' in lscpi_resp.stdout)
@@ -160,6 +163,16 @@
 
 - name: Install pip modules needed by Ansible via raw method
   raw: "pip install {{ item }}"
+  loop:
+    - apprise
+    - dnspython
+    - lxml
+    - jmespath
+    - passlib
+  ignore_errors: yes
+
+- name: Install pip3 modules needed by Ansible via raw method
+  raw: "pip3 install {{ item }}"
   loop:
     - apprise
     - dnspython

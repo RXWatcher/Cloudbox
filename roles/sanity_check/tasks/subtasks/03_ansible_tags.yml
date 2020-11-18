@@ -1,0 +1,33 @@
+#########################################################################
+# Title:         Cloudbox: Sanity Check | Ansible Tags                  #
+# Author(s):     desimaniac, EnorMOZ                                    #
+# URL:           https://github.com/cloudbox/cloudbox                   #
+# --                                                                    #
+#         Part of the Cloudbox project: https://cloudbox.works          #
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+# Source: http://blog.leifmadsen.com/blog/2017/01/04/finding-available-ansible-tags-in-playbooks-and-roles/
+- name: Ansible Tags | Get all available Ansible tags
+  shell: "{{ sanity_check_ansible_tags_lookup_command }}"
+  register: t
+  changed_when: no
+  when:
+   - not continuous_integration
+   - "'cloudbox_mod' not in playbook_dir"
+   - "'community' not in playbook_dir"
+
+- name: Ansible Tags | Ensure valid Ansible tag(s) were provided
+  assert:
+    that:
+      - '"{{ item }}" in t.stdout_lines'
+    msg: >-
+      You must supply valid tag(s) via '--tags TAG'
+      (get a list of valid tags by running 'ansible-playbook cloudbox.yml --list-tags')
+    quiet: yes
+  with_items: "{{ ansible_run_tags }}"
+  when:
+   - not continuous_integration
+   - "'cloudbox_' not in playbook_dir"
+   - "'community' not in playbook_dir"
